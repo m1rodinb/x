@@ -128,15 +128,13 @@ h1 {
     width: 600px;
     float: left;
     margin-right: 0;
-    /* left: 100px; */
     aspect-ratio: auto 100 / 100;
 
 }
 
 #canvas-container {
+    margin: 0 -100vw;
     flex: 1;
-    height: 30vh;
-    left: 100px;
     display: flex;
     float: left;
     align-items: center;
@@ -175,10 +173,10 @@ ul {
 }
 
 .infoContainer {
-    margin-left: -40vw;
+    margin-right: 15vw;
     flex: 1;
-    padding: 0 3vw;
-    max-width: 35%;
+    padding: 0 -100vw;
+    max-width: 400px;
 }
 
 .info2 {
@@ -244,7 +242,7 @@ section {
         height: 600px;
     }
 
-    .infoHeader {
+    #info2Header {
         text-align: center;
     }
     
@@ -257,10 +255,7 @@ section {
 
 @media (max-width:650px) {
 
-    .infoHeader {
-        text-align: center;
-    }
-    
+
     .whyGrid {
         width: 560px;
         margin: auto auto;
