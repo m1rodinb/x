@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dodecahedron</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .intro {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .header {
+            transition: transform 1.5s ease-out;
+            transition-delay: 1s;
+        }
+
+        .header.moved {
+            transform: translateX(200px);
+        }
+
+        .headerText {
+            font-size: 4rem;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+
+        #canvas-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-150%, -50%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 1.5s ease-out;
+            transition-delay: 1s;
+        }
+
+        #canvas-container.moved{
+            transform: translateX(50vw);
+
+        }
+
+        #canvas-container.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .headerText {
+                font-size: 2.5rem;
+            }
+            
+            .header.moved {
+                transform: translateX(100px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="intro">
+            <div class="header">
+                <h1 class="headerText">dodecahedron.</h1>
+            </div>
+        </section>
+        
+        <div id="canvas-container">
+            <canvas id="three-canvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, dodecahedron, directionalLight, ambientLight;
+        let isAnimating = true;
+        let rotationSpeed = 0.002;
+        let introAnimation = false; // Will start after delay
+        let introProgress = 0;
+        let currentRotationX = 0;
+        let currentRotationY = 0;
+        let currentRotationZ = 0;
+
+        function init() {
+            // Create scene
+            scene = new THREE.Scene();
+
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, 400 / 400, 0.1, 1000);
+            camera.position.set(0, 0, 8);
+
+            // Create renderer
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('three-canvas'),
+                antialias: true, 
+                alpha: true 
+            });
+            renderer.setSize(800, 800);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.setClearColor(0x000000, 0);
+
+            // Create dodecahedron geometry
+            const geometry = new THREE.DodecahedronGeometry(2.5, 0);
+            
+            // Create matte material
+            const material = new THREE.MeshLambertMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.9
+            });
+
+            // Create dodecahedron mesh
+            dodecahedron = new THREE.Mesh(geometry, material);
+            dodecahedron.castShadow = true;
+            dodecahedron.receiveShadow = true;
+            
+            // Set initial state for entrance animation
+            dodecahedron.rotation.set(0, 0, 0);
+            dodecahedron.position.set(-800, 0, 0); // Start from left side
+            
+            scene.add(dodecahedron);
+
+            // Add ambient light
+            ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+            scene.add(ambientLight);
+
+            // Add directional light
+            directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            directionalLight.position.set(5, 5, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // Add point lights
+            const pointLight = new THREE.PointLight(0x06b6d4, 0.8, 20);
+            pointLight.position.set(-3, 2, 4);
+            scene.add(pointLight);
+
+            const pointLight2 = new THREE.PointLight(0xa78bfa, 0.6, 15);
+            pointLight2.position.set(3, -2, -4);
+            scene.add(pointLight2);
+
+            // Start animations after 1 second
+            setTimeout(() => {
+                startAnimations();
+            }, 1000);
+
+            // Start render loop
+            animate();
+        }
+
+        function startAnimations() {
+            // Start 3D animation
+            introAnimation = true;
+            
+            // Move text to right
+            const header = document.querySelector('.header');
+            header.classList.add('moved');
+            
+            // Show canvas
+            const canvasContainer = document.getElementById('canvas-container');
+            canvasContainer.classList.add('visible');
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Continuous base rotation (except during intro when it's handled below)
+            if (isAnimating && !introAnimation) {
+                currentRotationX += rotationSpeed * 0.1;
+                currentRotationY += rotationSpeed;
+                currentRotationZ += rotationSpeed * 0.04;
+            }
+
+            if (introAnimation) {
+                // Entrance animation - slide in from left
+                introProgress += 0.015;
+                
+                if (introProgress <= 1) {
+                    // Easing function for smooth entrance
+                    const easeOut = 1 - Math.pow(1 - introProgress, 3);
+                    
+                    // Slide in from left
+                    dodecahedron.position.x = 0;
+                    dodecahedron.position.y = -8 + (8 * easeOut);
+                    dodecahedron.position.z = 0;
+                    
+                    // Rotation during entrance
+                    const extraRotSpeed = (1 - easeOut) * 0.048;
+                    currentRotationX += (rotationSpeed + extraRotSpeed) * 0.1;
+                    currentRotationY += (rotationSpeed + extraRotSpeed) * 1.0;
+                    currentRotationZ += (rotationSpeed + extraRotSpeed) * 0.04;
+                    
+                    // Fade in
+                    dodecahedron.material.opacity = easeOut * 0.9;
+                } else {
+                    // End intro animation
+                    introAnimation = false;
+                    dodecahedron.position.set(0, 0, 0);
+                    dodecahedron.material.opacity = 0.9;
+                }
+            }
+            
+            // Apply rotation
+            dodecahedron.rotation.x = currentRotationX;
+            dodecahedron.rotation.y = currentRotationY;
+            dodecahedron.rotation.z = currentRotationZ;
+
+            renderer.render(scene, camera);
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
