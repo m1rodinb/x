@@ -7,6 +7,15 @@ let currentRotationX = 0;
 let currentRotationY = 0;
 let currentRotationZ = 0;
 
+function resizeRenderer() {
+    const canvas = renderer.domElement;
+    const rect = canvas.getBoundingClientRect();
+
+    renderer.setSize(rect.width, rect.height, false);
+    camera.aspect = rect.width / rect.height;
+    camera.updateProjectionMatrix();
+}
+
 function init() {
     // Main scene setup
     scene = new THREE.Scene();
@@ -18,7 +27,8 @@ function init() {
         antialias: true, 
         alpha: true 
     });
-    renderer.setSize(1000, 1000);
+    resizeRenderer();
+    window.addEventListener('resize', resizeRenderer);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.setClearColor(0x000000, 0);
