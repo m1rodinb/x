@@ -124,8 +124,8 @@ h1 {
 }
 
 #threeCanvas {
-    height: 600px;
-    width: 600px;
+    height: 800px;
+    width: 800px;
     float: left;
     margin-right: 0;
     aspect-ratio: auto 100 / 100;
@@ -173,9 +173,8 @@ ul {
 }
 
 .infoContainer {
-    margin-right: 15vw;
+    margin-right:20vw;
     flex: 1;
-    padding: 0 -100vw;
     max-width: 400px;
 }
 
@@ -251,9 +250,13 @@ section {
         margin: auto auto;
     }
 
+    .infoContainer{
+        margin-right: 5vw;
+    }
+
 }
 
-@media (max-width:650px) {
+@media (max-width:700px) {
 
 
     .whyGrid {
